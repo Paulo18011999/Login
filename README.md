@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
   <title>1° Seção - Habilidades sociais e interação social - Tela de Login</title>
