@@ -55,7 +55,7 @@
   </style>
 </head>
 <body>
-  <img src="https://drive.google.com/file/d/1Tmdxq_KWQrBnlygV6stafJZxMQJuLkqW/view?usp=drive_link" alt="Logo" id="logo">
+  <img src="https://drive.google.com/uc?id=1OGO1pmixSc8bkdHxa50BH_Q_ixoHTjU7" alt="Logo" id="logo">
   <h1>1° Seção - Habilidades sociais e interação social</h1>
   <div id="login-form">
     <form method="post" action="">
