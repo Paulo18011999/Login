@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>E-protocolo · Borderô de pagamentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --blue-900: #0d47a1;
+        --blue-700: #1565c0;
+        --blue-100: #e3f2fd;
+        --yellow-500: #fdd835;
+        --yellow-300: #ffef62;
+        --slate-900: #102042;
+        --slate-600: #405173;
+        --slate-100: #f3f6fc;
+        --border-radius: 18px;
+        --shadow-md: 0 18px 40px rgba(13, 71, 161, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: var(--slate-100);
+        color: var(--slate-900);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      .hero {
+        background: linear-gradient(110deg, var(--blue-900), var(--blue-700));
+        color: #fff;
+        padding: 28px clamp(24px, 6vw, 64px);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 24px;
+        border-bottom-left-radius: 36px;
+        border-bottom-right-radius: 36px;
+        box-shadow: var(--shadow-md);
+      }
+
+      .hero-logo {
+        width: clamp(72px, 12vw, 110px);
+        height: clamp(72px, 12vw, 110px);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        display: grid;
+        place-items: center;
+        padding: 12px;
+      }
+
+      .hero-logo img {
+        max-width: 100%;
+        border-radius: 16px;
+      }
+
+      .hero-text {
+        flex: 1 1 280px;
+      }
+
+      .hero-text h1 {
+        font-size: clamp(28px, 5vw, 40px);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .hero-text p {
+        margin-top: 6px;
+        opacity: 0.85;
+        font-weight: 300;
+        letter-spacing: 0.8px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(13, 71, 161, 0.25);
+      }
+
+      .btn-primary {
+        background: var(--yellow-500);
+        color: var(--slate-900);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #fff;
+      }
+
+      main {
+        padding: clamp(24px, 6vw, 64px);
+        margin-top: -32px;
+      }
+
+      .filters {
+        background: #fff;
+        border-radius: var(--border-radius);
+        padding: 18px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        box-shadow: var(--shadow-md);
+      }
+
+      .filters label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--slate-600);
+        letter-spacing: 0.6px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .filters select,
+      .filters input[type='search'] {
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(13, 71, 161, 0.1);
+        background: var(--slate-100);
+        min-width: 180px;
+        font-size: 14px;
+      }
+
+      .grid-panels {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 24px;
+        margin-top: 24px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        box-shadow: var(--shadow-md);
+      }
+
+      .card h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--blue-900);
+        margin-bottom: 18px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      table thead {
+        background: var(--blue-900);
+        color: white;
+      }
+
+      table th,
+      table td {
+        padding: 12px;
+        text-align: left;
+        font-size: 13px;
+      }
+
+      table tbody tr:nth-child(odd) {
+        background: rgba(13, 71, 161, 0.04);
+      }
+
+      table tbody tr:hover {
+        background: rgba(13, 71, 161, 0.08);
+      }
+
+      .status-chip {
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .status-pendente {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--blue-700);
+        color: var(--blue-700);
+      }
+
+      .status-automatico {
+        background: rgba(255, 235, 59, 0.2);
+        border: 1px solid rgba(255, 235, 59, 0.4);
+        color: #8c6d1f;
+      }
+
+      .status-atraso {
+        background: rgba(239, 83, 80, 0.16);
+        border: 1px solid rgba(229, 57, 53, 0.4);
+        color: #d32f2f;
+      }
+
+      .status-pago {
+        background: rgba(56, 142, 60, 0.15);
+        border: 1px solid rgba(67, 160, 71, 0.35);
+        color: #2e7d32;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--slate-600);
+        border: 1px dashed rgba(13, 71, 161, 0.2);
+        border-radius: var(--border-radius);
+      }
+
+      .section-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-height: 340px;
+        overflow: auto;
+        padding-right: 6px;
+      }
+
+      .list-item {
+        border: 1px solid rgba(13, 71, 161, 0.12);
+        border-radius: 16px;
+        padding: 12px 14px;
+        background: rgba(227, 242, 253, 0.45);
+      }
+
+      .list-item strong {
+        display: block;
+        font-size: 14px;
+        color: var(--blue-900);
+      }
+
+      .list-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        border-radius: 999px;
+        padding: 4px 10px;
+        background: rgba(21, 101, 192, 0.12);
+        color: var(--blue-700);
+      }
+
+      footer {
+        text-align: center;
+        padding: 24px;
+        color: var(--slate-600);
+        font-size: 12px;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(12, 31, 66, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        z-index: 40;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-box {
+        background: #fff;
+        border-radius: 24px;
+        width: min(720px, 100%);
+        max-height: 90vh;
+        overflow: auto;
+        padding: 24px clamp(20px, 4vw, 32px);
+        box-shadow: var(--shadow-md);
+        position: relative;
+      }
+
+      .modal-box h3 {
+        font-size: 20px;
+        color: var(--blue-900);
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--slate-600);
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .form-grid.two {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .form-grid.three {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .form-field label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--slate-600);
+      }
+
+      .form-field input,
+      .form-field select,
+      .form-field textarea {
+        border-radius: 14px;
+        border: 1px solid rgba(13, 71, 161, 0.2);
+        padding: 10px 12px;
+        font-size: 14px;
+        font-family: inherit;
+        resize: vertical;
+      }
+
+      .form-field textarea {
+        min-height: 96px;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .pill-button {
+        background: rgba(21, 101, 192, 0.14);
+        border-radius: 999px;
+        padding: 8px 16px;
+        border: none;
+        color: var(--blue-900);
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(253, 216, 53, 0.35);
+        color: #805a04;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+      }
+
+      .loader {
+        display: none;
+        width: 100%;
+        justify-content: center;
+        padding: 18px 0;
+      }
+
+      .loader.active {
+        display: flex;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(13, 71, 161, 0.18);
+        border-top-color: var(--yellow-500);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .grid-panels {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .hero {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .hero-actions {
+          width: 100%;
+        }
+        .filters label {
+          min-width: 48%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-logo">
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRla9pIu949btvHykM3noQ36nOn3KzPSra4pw&s"
+          alt="Logo E-protocolo"
+        />
+      </div>
+      <div class="hero-text">
+        <h1>E-protocolo</h1>
+        <p>Borderô de pagamentos</p>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="btnNovaConta">Nova conta</button>
+        <button class="btn btn-secondary" id="btnGrafico">Gráficos</button>
+        <button class="btn btn-ghost" id="btnConfiguracoes">Configurações</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="filters">
+        <label>
+          Mês de referência
+          <select id="filtroMes"></select>
+        </label>
+        <label>
+          Pesquisa rápida
+          <input type="search" id="filtroTexto" placeholder="Busque por empresa, título, status…" />
+        </label>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btnExportar">Exportar CSV</button>
+          <button class="btn btn-secondary" id="btnFecharMes">Fechar mês</button>
+        </div>
+      </section>
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+      </div>
+
+      <section class="grid-panels" id="conteudo">
+        <article class="card">
+          <div class="section-actions">
+            <h2>Contas a pagar</h2>
+            <div class="hero-actions">
+              <button class="pill-button" data-status="all">Todas</button>
+              <button class="pill-button" data-status="Pendente">Pendentes</button>
+              <button class="pill-button" data-status="Em Atraso">Em atraso</button>
+              <button class="pill-button" data-status="Pago">Pagas</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Título</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Status</th>
+                  <th>Conta bancária</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaContas"></tbody>
+            </table>
+            <div class="empty-state" id="contasVazio" hidden>
+              Nenhuma conta encontrada para os filtros selecionados.
+            </div>
+          </div>
+        </article>
+
+        <aside class="card">
+          <div class="section-actions">
+            <h2>Cadastros rápidos</h2>
+            <button class="btn btn-primary" id="btnNovaEmpresa">Adicionar empresa</button>
+          </div>
+
+          <h3 style="margin-top: 16px; font-size: 16px; color: var(--slate-600);">Empresas</h3>
+          <div class="list" id="listaEmpresas"></div>
+
+          <div class="section-actions" style="margin-top: 24px;">
+            <h3 style="font-size: 16px; color: var(--slate-600);">Contas bancárias</h3>
+            <button class="btn btn-secondary" id="btnNovaContaBancaria">Adicionar conta</button>
+          </div>
+          <div class="list" id="listaContasBancarias"></div>
+        </aside>
+      </section>
+    </main>
+
+    <footer>
+      Configure as notificações na aba de configurações para receber alertas automáticos por e-mail.
+    </footer>
+
+    <div class="modal" id="modalConta">
+      <div class="modal-box">
+        <button class="modal-close" data-close="modalConta">×</button>
+        <h3 id="tituloModalConta">Nova conta</h3>
+        <form id="formConta">
+          <input type="hidden" name="ID" id="contaId" />
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="contaEmpresa">Empresa</label>
+              <select id="contaEmpresa" name="EmpresaID" required></select>
+            </div>
+            <div class="form-field">
+              <label for="contaContaBancaria">Conta bancária</label>
+              <select id="contaContaBancaria" name="ContaBancariaID">
+                <option value="">Selecionar…</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="contaTitulo">Título</label>
+              <input type="text" id="contaTitulo" name="Titulo" required />
+            </div>
+            <div class="form-field">
+              <label for="contaTipo">Tipo</label>
+              <input type="text" id="contaTipo" name="TipoConta" placeholder="Ex.: Energia, Honorários" />
+            </div>
+          </div>
+
+          <div class="form-grid three">
+            <div class="form-field">
+              <label for="contaValor">Valor</label>
+              <input type="number" step="0.01" id="contaValor" name="Valor" required />
+            </div>
+            <div class="form-field">
+              <label for="contaVencimento">Vencimento</label>
+              <input type="date" id="contaVencimento" name="Vencimento" required />
+            </div>
+            <div class="form-field">
+              <label for="contaMes">Mês ref.</label>
+              <input type="month" id="contaMes" name="MesReferencia" />
+            </div>
+          </div>
+
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="contaDescricao">Descrição</label>
+              <textarea id="contaDescricao" name="Descricao" placeholder="Detalhes adicionais"></textarea>
+            </div>
+            <div class="form-field">
+              <label for="contaObservacoes">Observações internas</label>
+              <textarea id="contaObservacoes" name="ObservacoesInternas"></textarea>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="checkbox">
+              <input type="checkbox" id="contaDebitoAutomatico" name="DebitoAutomatico" /> Débito automático
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalConta">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar conta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="modalEmpresa">
+      <div class="modal-box">
+        <button class="modal-close" data-close="modalEmpresa">×</button>
+        <h3 id="tituloModalEmpresa">Nova empresa</h3>
+        <form id="formEmpresa">
+          <input type="hidden" id="empresaId" name="ID" />
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="empresaNome">Nome</label>
+              <input type="text" id="empresaNome" name="Nome" required />
+            </div>
+            <div class="form-field">
+              <label for="empresaEmail">E-mail</label>
+              <input type="email" id="empresaEmail" name="Email" placeholder="financeiro@empresa.com" />
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="empresaTipo">Tipo</label>
+              <input type="text" id="empresaTipo" name="Tipo" placeholder="Fornecedor, Cliente…" />
+            </div>
+            <div class="form-field">
+              <label for="empresaTelefone">Telefone</label>
+              <input type="tel" id="empresaTelefone" name="Telefone" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="empresaObservacoes">Observações</label>
+            <textarea id="empresaObservacoes" name="Observacoes"></textarea>
+          </div>
+          <div class="form-field">
+            <label class="checkbox">
+              <input type="checkbox" id="empresaAtivo" name="Ativo" checked /> Ativa
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalEmpresa">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar empresa</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="modalContaBancaria">
+      <div class="modal-box">
+        <button class="modal-close" data-close="modalContaBancaria">×</button>
+        <h3 id="tituloModalContaBancaria">Nova conta bancária</h3>
+        <form id="formContaBancaria">
+          <input type="hidden" id="contaBancariaId" name="ID" />
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="bancoNome">Banco</label>
+              <input type="text" id="bancoNome" name="Banco" required />
+            </div>
+            <div class="form-field">
+              <label for="bancoAgencia">Agência</label>
+              <input type="text" id="bancoAgencia" name="Agencia" />
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="bancoConta">Conta</label>
+              <input type="text" id="bancoConta" name="Conta" required />
+            </div>
+            <div class="form-field">
+              <label for="bancoCarteira">Carteira</label>
+              <input type="text" id="bancoCarteira" name="Carteira" />
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="bancoTipo">Tipo</label>
+              <input type="text" id="bancoTipo" name="Tipo" placeholder="Corrente, Poupança…" />
+            </div>
+            <div class="form-field">
+              <label for="bancoEmail">E-mail para notificações</label>
+              <input type="email" id="bancoEmail" name="Email" placeholder="tesouraria@empresa.com" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="bancoObservacoes">Observações</label>
+            <textarea id="bancoObservacoes" name="Observacoes"></textarea>
+          </div>
+          <div class="form-grid two">
+            <label class="checkbox">
+              <input type="checkbox" id="bancoNotificar" name="Notificar" /> Notificar vencimentos
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="bancoAtivo" name="Ativo" checked /> Ativa
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalContaBancaria">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar conta bancária</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="modalConfiguracoes">
+      <div class="modal-box">
+        <button class="modal-close" data-close="modalConfiguracoes">×</button>
+        <h3>Configurações & Notificações</h3>
+        <form id="formConfiguracoes">
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="configEmail">E-mail para notificações</label>
+              <input type="email" id="configEmail" name="EmailNotificacao" required />
+            </div>
+            <div class="form-field">
+              <label for="configDias">Dias de antecedência</label>
+              <input type="number" id="configDias" name="DiasAntecedencia" min="1" max="10" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="configObs">Observação padrão para fechamento</label>
+            <textarea id="configObs" name="ObservacaoFechamento"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalConfiguracoes">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar configurações</button>
+          </div>
+        </form>
+        <div style="margin-top: 20px;">
+          <span class="tag">Notificações</span>
+          <p style="margin-top: 12px; color: var(--slate-600); font-size: 14px;">
+            Agende o gatilho <strong>processNotifications</strong> diário para garantir que os lembretes sejam
+            enviados automaticamente.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modalFechamento">
+      <div class="modal-box">
+        <button class="modal-close" data-close="modalFechamento">×</button>
+        <h3>Fechar mês</h3>
+        <form id="formFechamento">
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="fecharMes">Mês de referência</label>
+              <input type="month" id="fecharMes" name="mesReferencia" required />
+            </div>
+            <div class="form-field">
+              <label for="fecharObs">Observação</label>
+              <textarea id="fecharObs" name="observacao" placeholder="Resumo do mês"></textarea>
+            </div>
+          </div>
+          <p style="margin-top: 12px; font-size: 14px; color: var(--slate-600);">
+            As contas serão enviadas para o histórico e replicadas para o mês seguinte com novas datas de
+            vencimento.
+          </p>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalFechamento">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Confirmar fechamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="modalGraficos">
+      <div class="modal-box" style="width: min(860px, 100%);">
+        <button class="modal-close" data-close="modalGraficos">×</button>
+        <h3>Análises de despesas</h3>
+        <form id="formGraficos" class="form-grid three" style="margin-top: 16px;">
+          <div class="form-field">
+            <label for="graficoInicio">De</label>
+            <input type="month" id="graficoInicio" name="start" />
+          </div>
+          <div class="form-field">
+            <label for="graficoFim">Até</label>
+            <input type="month" id="graficoFim" name="end" />
+          </div>
+          <div class="form-field" style="align-self: end;">
+            <button type="submit" class="btn btn-primary">Atualizar gráfico</button>
+          </div>
+        </form>
+        <div style="margin-top: 24px;">
+          <canvas id="graficoDespesas" height="240"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="modalPagamento">
+      <div class="modal-box" style="max-width: 520px;">
+        <button class="modal-close" data-close="modalPagamento">×</button>
+        <h3>Registrar pagamento</h3>
+        <form id="formPagamento">
+          <input type="hidden" name="id" id="pagamentoId" />
+          <div class="form-grid two">
+            <div class="form-field">
+              <label for="pagamentoData">Data do pagamento</label>
+              <input type="date" id="pagamentoData" name="dataPagamento" required />
+            </div>
+            <div class="form-field">
+              <label for="pagamentoConta">Conta bancária</label>
+              <select id="pagamentoConta" name="contaBancariaId">
+                <option value="">Selecionar…</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalPagamento">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Confirmar pagamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const state = {
+        accounts: [],
+        companies: [],
+        bankAccounts: [],
+        months: [],
+        settings: {},
+        selectedMonth: '',
+        statusFilter: 'all',
+        search: ''
+      };
+
+      const statusClasses = {
+        Pendente: 'status-pendente',
+        'Em Atraso': 'status-atraso',
+        Pago: 'status-pago',
+        'Débito Automático': 'status-automatico'
+      };
+
+      const loader = document.getElementById('loader');
+      const tabelaContas = document.getElementById('tabelaContas');
+      const contasVazio = document.getElementById('contasVazio');
+      const filtroMes = document.getElementById('filtroMes');
+      const filtroTexto = document.getElementById('filtroTexto');
+
+      document.getElementById('btnNovaConta').addEventListener('click', () => openContaModal());
+      document.getElementById('btnNovaEmpresa').addEventListener('click', () => openEmpresaModal());
+      document.getElementById('btnNovaContaBancaria').addEventListener('click', () => openContaBancariaModal());
+      document.getElementById('btnConfiguracoes').addEventListener('click', () => openModal('modalConfiguracoes'));
+      document.getElementById('btnFecharMes').addEventListener('click', () => openModal('modalFechamento'));
+      document.getElementById('btnGrafico').addEventListener('click', () => {
+        openModal('modalGraficos');
+        renderChart();
+      });
+      document.getElementById('btnExportar').addEventListener('click', exportarCsv);
+
+      document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.close));
+      });
+
+      filtroMes.addEventListener('change', () => {
+        state.selectedMonth = filtroMes.value;
+        renderAccounts();
+      });
+
+      filtroTexto.addEventListener('input', event => {
+        state.search = event.target.value.toLowerCase();
+        renderAccounts();
+      });
+
+      document.querySelectorAll('.pill-button').forEach(button => {
+        button.addEventListener('click', () => {
+          state.statusFilter = button.dataset.status;
+          document.querySelectorAll('.pill-button').forEach(btn => btn.classList.remove('btn-primary'));
+          button.classList.add('btn-primary');
+          renderAccounts();
+        });
+      });
+
+      document.getElementById('formConta').addEventListener('submit', event => {
+        event.preventDefault();
+        const form = event.target;
+        const payload = Object.fromEntries(new FormData(form).entries());
+        payload.Valor = payload.Valor ? Number(payload.Valor) : '';
+        payload.DebitoAutomatico = form.querySelector('#contaDebitoAutomatico').checked;
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(data => {
+            state.accounts = data.accounts;
+            state.months = data.months;
+            updateMonthFilter();
+            renderAccounts();
+            closeModal('modalConta');
+            form.reset();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .saveAccount(payload);
+      });
+
+      document.getElementById('formEmpresa').addEventListener('submit', event => {
+        event.preventDefault();
+        const form = event.target;
+        const payload = Object.fromEntries(new FormData(form).entries());
+        payload.Ativo = form.querySelector('#empresaAtivo').checked;
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(items => {
+            state.companies = items;
+            renderCompanies();
+            populateCompaniesSelect();
+            closeModal('modalEmpresa');
+            form.reset();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .saveCompany(payload);
+      });
+
+      document.getElementById('formContaBancaria').addEventListener('submit', event => {
+        event.preventDefault();
+        const form = event.target;
+        const payload = Object.fromEntries(new FormData(form).entries());
+        payload.Ativo = form.querySelector('#bancoAtivo').checked;
+        payload.Notificar = form.querySelector('#bancoNotificar').checked;
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(items => {
+            state.bankAccounts = items;
+            renderBankAccounts();
+            populateBankAccountsSelect();
+            closeModal('modalContaBancaria');
+            form.reset();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .saveBankAccount(payload);
+      });
+
+      document.getElementById('formConfiguracoes').addEventListener('submit', event => {
+        event.preventDefault();
+        const payload = Object.fromEntries(new FormData(event.target).entries());
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(settings => {
+            state.settings = settings;
+            closeModal('modalConfiguracoes');
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .saveSettings(payload);
+      });
+
+      document.getElementById('formFechamento').addEventListener('submit', event => {
+        event.preventDefault();
+        const payload = Object.fromEntries(new FormData(event.target).entries());
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(data => {
+            state.accounts = data.accounts;
+            state.months = data.months;
+            updateMonthFilter();
+            renderAccounts();
+            closeModal('modalFechamento');
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .closeMonth(payload);
+      });
+
+      document.getElementById('formGraficos').addEventListener('submit', event => {
+        event.preventDefault();
+        renderChart();
+      });
+
+      document.getElementById('formPagamento').addEventListener('submit', event => {
+        event.preventDefault();
+        const payload = Object.fromEntries(new FormData(event.target).entries());
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(items => {
+            state.accounts = items;
+            renderAccounts();
+            closeModal('modalPagamento');
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .markAccountPaid(payload);
+      });
+
+      function toggleLoader(show) {
+        loader.classList.toggle('active', !!show);
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add('active');
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+      }
+
+      function openContaModal(account) {
+        const form = document.getElementById('formConta');
+        form.reset();
+        populateCompaniesSelect(account && account.EmpresaID);
+        populateBankAccountsSelect('contaContaBancaria', account && account.ContaBancariaID);
+        if (account) {
+          document.getElementById('tituloModalConta').textContent = 'Editar conta';
+          Object.keys(account).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field) field.value = account[key];
+          });
+          document.getElementById('contaDebitoAutomatico').checked = account.DebitoAutomatico === 'TRUE';
+          document.getElementById('contaEmpresa').value = account.EmpresaID || '';
+          document.getElementById('contaContaBancaria').value = account.ContaBancariaID || '';
+        } else {
+          document.getElementById('tituloModalConta').textContent = 'Nova conta';
+          document.getElementById('contaMes').value = state.selectedMonth || '';
+        }
+        openModal('modalConta');
+      }
+
+      function openEmpresaModal(empresa) {
+        const form = document.getElementById('formEmpresa');
+        form.reset();
+        if (empresa) {
+          document.getElementById('tituloModalEmpresa').textContent = 'Editar empresa';
+          Object.keys(empresa).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field) {
+              if (field.type === 'checkbox') {
+                field.checked = empresa[key] === true || empresa[key] === 'TRUE';
+              } else {
+                field.value = empresa[key] || '';
+              }
+            }
+          });
+          form.querySelector('#empresaAtivo').checked = empresa.Ativo !== 'FALSE';
+        } else {
+          document.getElementById('tituloModalEmpresa').textContent = 'Nova empresa';
+          form.querySelector('#empresaAtivo').checked = true;
+        }
+        openModal('modalEmpresa');
+      }
+
+      function openContaBancariaModal(conta) {
+        const form = document.getElementById('formContaBancaria');
+        form.reset();
+        if (conta) {
+          document.getElementById('tituloModalContaBancaria').textContent = 'Editar conta bancária';
+          Object.keys(conta).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field) {
+              if (field.type === 'checkbox') {
+                field.checked = conta[key] === true || conta[key] === 'TRUE';
+              } else {
+                field.value = conta[key] || '';
+              }
+            }
+          });
+          form.querySelector('#bancoAtivo').checked = conta.Ativo !== 'FALSE';
+          form.querySelector('#bancoNotificar').checked = conta.Notificar === 'TRUE';
+        } else {
+          document.getElementById('tituloModalContaBancaria').textContent = 'Nova conta bancária';
+          form.querySelector('#bancoAtivo').checked = true;
+        }
+        openModal('modalContaBancaria');
+      }
+
+      function openPagamentoModal(account) {
+        const form = document.getElementById('formPagamento');
+        form.reset();
+        populateBankAccountsSelect('pagamentoConta', account && account.ContaBancariaID);
+        document.getElementById('pagamentoId').value = account.ID;
+        document.getElementById('pagamentoData').value = new Date().toISOString().slice(0, 10);
+        openModal('modalPagamento');
+      }
+
+      function populateCompaniesSelect(selectedId) {
+        const select = document.getElementById('contaEmpresa');
+        select.innerHTML = '';
+        state.companies
+          .filter(item => item.Ativo !== 'FALSE')
+          .forEach(empresa => {
+            const option = document.createElement('option');
+            option.value = empresa.ID;
+            option.textContent = empresa.Nome || 'Sem nome';
+            select.appendChild(option);
+          });
+        if (selectedId && !state.companies.some(item => item.ID === selectedId && item.Ativo !== 'FALSE')) {
+          const extra = document.createElement('option');
+          extra.value = selectedId;
+          const found = state.companies.find(item => item.ID === selectedId);
+          extra.textContent = found ? found.Nome || 'Empresa' : 'Empresa inativa';
+          select.appendChild(extra);
+        }
+        if (selectedId) {
+          select.value = selectedId;
+        }
+      }
+
+      function populateBankAccountsSelect(selectId = 'contaContaBancaria', selectedId) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">Selecionar…</option>';
+        state.bankAccounts
+          .filter(item => item.Ativo !== 'FALSE')
+          .forEach(conta => {
+            const option = document.createElement('option');
+            option.value = conta.ID;
+            option.textContent = `${conta.Banco || 'Conta'} • ${conta.Conta || ''}`;
+            select.appendChild(option);
+          });
+        if (selectedId && !state.bankAccounts.some(item => item.ID === selectedId && item.Ativo !== 'FALSE')) {
+          const extra = document.createElement('option');
+          extra.value = selectedId;
+          const found = state.bankAccounts.find(item => item.ID === selectedId);
+          extra.textContent = found
+            ? `${found.Banco || 'Conta'} • ${found.Conta || ''}`
+            : 'Conta inativa';
+          select.appendChild(extra);
+        }
+        if (selectedId) {
+          select.value = selectedId;
+        }
+      }
+
+      function renderAccounts() {
+        const rows = state.accounts
+          .filter(account => {
+            if (state.selectedMonth && account.MesReferencia !== state.selectedMonth) return false;
+            if (state.statusFilter !== 'all' && account.Status !== state.statusFilter) return false;
+            if (!state.search) return true;
+            const tokens = [account.Empresa, account.Titulo, account.Status, account.ContaBancaria]
+              .join(' ')
+              .toLowerCase();
+            return tokens.includes(state.search);
+          })
+          .sort((a, b) => (a.Vencimento || '').localeCompare(b.Vencimento || ''));
+
+        tabelaContas.innerHTML = '';
+        if (!rows.length) {
+          contasVazio.hidden = false;
+          return;
+        }
+        contasVazio.hidden = true;
+
+        rows.forEach(account => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${account.Empresa || '-'}</td>
+            <td>${account.Titulo || '-'}</td>
+            <td>R$ ${Number(account.Valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+            <td>${account.Vencimento || '-'}</td>
+            <td>${renderStatus(account.Status)}</td>
+            <td>${account.ContaBancaria || '-'}</td>
+            <td>
+              <div class="list-actions">
+                <button class="pill-button" data-action="editar">Editar</button>
+                <button class="pill-button" data-action="pagar">Pagar</button>
+                <button class="pill-button" data-action="reabrir">Reabrir</button>
+                <button class="pill-button" data-action="excluir">Excluir</button>
+              </div>
+            </td>
+          `;
+          tr.querySelector('[data-action="editar"]').addEventListener('click', () => openContaModal(account));
+          tr.querySelector('[data-action="pagar"]').addEventListener('click', () => openPagamentoModal(account));
+          tr.querySelector('[data-action="reabrir"]').addEventListener('click', () => reabrirConta(account));
+          tr.querySelector('[data-action="excluir"]').addEventListener('click', () => excluirConta(account));
+          tabelaContas.appendChild(tr);
+        });
+      }
+
+      function renderStatus(status) {
+        const span = document.createElement('span');
+        span.className = `status-chip ${statusClasses[status] || ''}`;
+        span.textContent = status || '—';
+        return span.outerHTML;
+      }
+
+      function renderCompanies() {
+        const list = document.getElementById('listaEmpresas');
+        list.innerHTML = '';
+        if (!state.companies.length) {
+          list.innerHTML = '<div class="empty-state">Cadastre empresas para agilizar os lançamentos.</div>';
+          return;
+        }
+        state.companies.forEach(empresa => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          item.innerHTML = `
+            <strong>${empresa.Nome || 'Sem nome'}</strong>
+            <div style="font-size: 12px; color: var(--slate-600);">
+              ${empresa.Email || ''}<br />${empresa.Telefone || ''}
+            </div>
+            <div class="list-actions">
+              <button class="pill-button" data-action="editar">Editar</button>
+              <button class="pill-button" data-action="excluir">Excluir</button>
+            </div>
+          `;
+          item.querySelector('[data-action="editar"]').addEventListener('click', () => openEmpresaModal(empresa));
+          item.querySelector('[data-action="excluir"]').addEventListener('click', () => excluirEmpresa(empresa));
+          list.appendChild(item);
+        });
+      }
+
+      function renderBankAccounts() {
+        const list = document.getElementById('listaContasBancarias');
+        list.innerHTML = '';
+        if (!state.bankAccounts.length) {
+          list.innerHTML = '<div class="empty-state">Cadastre contas bancárias utilizadas nos pagamentos.</div>';
+          return;
+        }
+        state.bankAccounts.forEach(conta => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          item.innerHTML = `
+            <strong>${conta.Banco || 'Conta'}</strong>
+            <div class="badge">${conta.Conta || ''}</div>
+            <div style="font-size: 12px; color: var(--slate-600); margin-top: 6px;">
+              ${conta.Email || ''}
+            </div>
+            <div class="list-actions">
+              <button class="pill-button" data-action="editar">Editar</button>
+              <button class="pill-button" data-action="excluir">Excluir</button>
+            </div>
+          `;
+          item.querySelector('[data-action="editar"]').addEventListener('click', () => openContaBancariaModal(conta));
+          item.querySelector('[data-action="excluir"]').addEventListener('click', () => excluirContaBancaria(conta));
+          list.appendChild(item);
+        });
+      }
+
+      function excluirConta(account) {
+        if (!confirm('Excluir conta selecionada?')) return;
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(data => {
+            state.accounts = data.accounts;
+            state.months = data.months;
+            updateMonthFilter();
+            renderAccounts();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .deleteAccount(account.ID);
+      }
+
+      function excluirEmpresa(empresa) {
+        if (!confirm('Remover empresa?')) return;
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(items => {
+            state.companies = items;
+            renderCompanies();
+            populateCompaniesSelect();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .deleteCompany(empresa.ID);
+      }
+
+      function excluirContaBancaria(conta) {
+        if (!confirm('Remover conta bancária?')) return;
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(items => {
+            state.bankAccounts = items;
+            renderBankAccounts();
+            populateBankAccountsSelect();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .deleteBankAccount(conta.ID);
+      }
+
+      function reabrirConta(account) {
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(items => {
+            state.accounts = items;
+            renderAccounts();
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .reopenAccount(account.ID);
+      }
+
+      function exportarCsv() {
+        toggleLoader(true);
+        const filters = { month: state.selectedMonth };
+        google.script.run
+          .withSuccessHandler(file => {
+            toggleLoader(false);
+            if (!file) return;
+            const link = document.createElement('a');
+            link.href = `data:text/csv;base64,${file.base64}`;
+            link.download = file.fileName;
+            link.click();
+          })
+          .withFailureHandler(showError)
+          .getAccountsCsvData(filters);
+      }
+
+      let chartInstance = null;
+      function renderChart() {
+        const form = document.getElementById('formGraficos');
+        const filters = Object.fromEntries(new FormData(form).entries());
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(dataset => {
+            toggleLoader(false);
+            const ctx = document.getElementById('graficoDespesas');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: dataset.labels,
+                datasets: [
+                  {
+                    label: 'Total do período',
+                    data: dataset.values,
+                    backgroundColor: '#fdd835',
+                    borderRadius: 12
+                  }
+                ]
+              },
+              options: {
+                scales: {
+                  y: {
+                    ticks: {
+                      callback: value =>
+                        value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    }
+                  }
+                }
+              }
+            });
+          })
+          .withFailureHandler(showError)
+          .getChartData(filters);
+      }
+
+      function updateMonthFilter() {
+        const previous = state.selectedMonth;
+        filtroMes.innerHTML = '<option value="">Todos os meses</option>';
+        state.months.forEach(month => {
+          const option = document.createElement('option');
+          option.value = month;
+          option.textContent = month;
+          filtroMes.appendChild(option);
+        });
+        if (previous) {
+          filtroMes.value = previous;
+        }
+      }
+
+      function showError(error) {
+        toggleLoader(false);
+        console.error(error);
+        alert(error && error.message ? error.message : 'Ocorreu um erro ao processar a ação.');
+      }
+
+      function carregarDados() {
+        toggleLoader(true);
+        google.script.run
+          .withSuccessHandler(data => {
+            state.accounts = data.accounts || [];
+            state.companies = data.companies || [];
+            state.bankAccounts = data.bankAccounts || [];
+            state.months = data.months || [];
+            state.settings = data.settings || {};
+            if (!state.selectedMonth && state.months.length) {
+              state.selectedMonth = state.months[state.months.length - 1];
+            }
+            updateMonthFilter();
+            renderAccounts();
+            renderCompanies();
+            renderBankAccounts();
+            filtroMes.value = state.selectedMonth;
+            document.getElementById('configEmail').value = state.settings.EmailNotificacao || '';
+            document.getElementById('configDias').value = state.settings.DiasAntecedencia || '';
+            document.getElementById('configObs').value = state.settings.ObservacaoFechamento || '';
+            toggleLoader(false);
+          })
+          .withFailureHandler(showError)
+          .getInitialData();
+      }
+
+      carregarDados();
+    </script>
+  </body>
+</html>
